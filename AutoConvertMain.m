@@ -1,4 +1,4 @@
-function AutoConvert()
+function AutoConvert(dirMon,minFilePassSizeMb)
 %
 % AutoConvert ( )
 %
@@ -10,31 +10,45 @@ function AutoConvert()
 % The program can also gracefully handle files being deleted
 % 
 
+dirMon_default='C:\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
 
-%%% START USER VARIABLES
-watching_dir='C:\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
-Low_Count_Size=0.0;     %min size in MB
+% parse inputs
+%%% monitoring directory
+if ~exist('dirMon','var')
+    warning('dirmon is undefined. Setting to default: %s',dirMon_default);
+    dirMon=dirMon_default;
+elseif isempty(dirMon)
+    warning('dirmon is undefined. Setting to default: %s',dirMon_default);
+    dirMon=dirMon_default;
+end
+%%% minFileSize
+if ~exist('minFilePassSizeMb','var')
+    warning('minFilePassSizeMb is undefined. Setting to default: 0 MB');
+    minFilePassSizeMb=0;     %min size in MB
+end
+
+%%% CONFIGS
 wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
 %must be greater than 2 as mod time is only recorded to seconds
 
 first_beep=0;
 second_beep=1;
 
-%%% END USER VAIRABLES
+%%% END CONFIGS 
 
 loop_num=1;
 pause on
-dir_init_content = dir(watching_dir);
+dir_init_content = dir(dirMon);
 initial_file_names = {dir_init_content.name};
 initial_file_dates={dir_init_content.date};
 initial_filenames_dates=[ initial_file_names ; initial_file_dates ]';
 %cut . and .. from the listings
 initial_filenames_dates=initial_filenames_dates(3:end,:);
 initial_file_names=initial_file_names(3:end);
-fprintf('\nMonitoring %s ', watching_dir);
+fprintf('\nMonitoring %s ', dirMon);
     
 while true
-    dir_init_content = dir(watching_dir);
+    dir_init_content = dir(dirMon);
     file_names = {dir_init_content.name};
     file_dates=  {dir_init_content.date};
     filenames_dates=[ file_names ; file_dates ]';
@@ -85,7 +99,7 @@ while true
         pass_line_test=zeros(numel(new_files),1);
         pause(0.05) %this makes sure that the first few lines have been written
         for k=1:numel(new_files)   
-          FID=fopen(fullfile(watching_dir,new_files{k}),'r');
+          FID=fopen(fullfile(dirMon,new_files{k}),'r');
           FirstLine=fgetl(FID);
           SecondLine=fgetl(FID);
           fclose(FID);
@@ -120,7 +134,7 @@ while true
             %here i check if the modification date is more than 1 second
             %old, this relies on this computers clock being close to the TDC
             %computer (or running on the TDC computer)
-            while is_early(watching_dir,new_files{k},wait_for_mod)
+            while is_early(dirMon,new_files{k},wait_for_mod)
                 fprintf('\b\b\b')
                 pause(0.05*wait_for_mod)
                 fprintf('.')
@@ -131,13 +145,13 @@ while true
                 pause(0.05*wait_for_mod)
             end
             
-            FileInfo=dir(fullfile(watching_dir,new_files{k}));
+            FileInfo=dir(fullfile(dirMon,new_files{k}));
             FileSize=FileInfo.bytes;
             FileSize=FileSize/(2^20);
             
             
             %I read the file size, if it is too small then i will not update
-            if FileSize>Low_Count_Size
+            if FileSize>minFilePassSizeMb
                 
                 if k==1 && second_beep
                     fs = 16000;
@@ -149,7 +163,7 @@ while true
                 end
                 %first reformat the string to have the path and the file number
                 filename=new_files(k);
-                filename=fullfile(watching_dir,new_files{k});%combine C:/dir/d123.txt
+                filename=fullfile(dirMon,new_files{k});%combine C:/dir/d123.txt
                 filename=filename(1:end-4); %C:/dir/d123
                 numpart=filename(end-5:end);  %/d123 so that can handle up to 99999
                 numpart=regexp(numpart,'\d*','Match'); %give number component %/d123
@@ -168,7 +182,7 @@ while true
                 %col to FileDateDay
                 mask=cellfun(@(x) isequal(x,new_files{k}), initial_filenames_dates(:,1));
                 %refresh the file info
-                FileInfo=dir(fullfile(watching_dir,new_files{k}));
+                FileInfo=dir(fullfile(dirMon,new_files{k}));
                 %write to the date
                 initial_filenames_dates(mask,2)={FileInfo.date};
                 
@@ -203,7 +217,7 @@ while true
             end
         end
         
-        fprintf('Monitoring %s ', watching_dir);
+        fprintf('Monitoring %s ', dirMon);
         loop_num=1;
     else
         
