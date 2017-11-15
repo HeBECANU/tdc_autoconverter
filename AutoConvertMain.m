@@ -1,6 +1,6 @@
-function AutoConvert(dirMon,minFilePassSizeMb)
+function AutoConvert(dirMon,minFilePassSizeMb,lenCntMovMean)
 %
-% AutoConvert ( )
+% AutoConvert (DIRMON,MINFILEPASSSIZEMB,LENCNTMOVMEAN)
 %
 % Continuously monitors the TDC output directory and processes incoming raw data into the TXY reconstructed format in real-time.
 % The motivation is to somewhat front load the computation so that at the back end (analysis) TXY data is ready to be directly loadable. 
@@ -26,6 +26,12 @@ if ~exist('minFilePassSizeMb','var')
     warning('minFilePassSizeMb is undefined. Setting to default: 0 MB');
     minFilePassSizeMb=0;     %min size in MB
 end
+%%% moving mean reporter
+if ~exist('lenCntMovMean','var')
+    warning('lenCntMovMean is undefined. Setting to default: 20');
+    lenCntMovMean=20;
+end
+
 
 %%% CONFIGS
 wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
@@ -47,6 +53,8 @@ initial_filenames_dates=initial_filenames_dates(3:end,:);
 initial_file_names=initial_file_names(3:end);
 fprintf('\nMonitoring %s ', dirMon);
     
+count_circ_buffer=NaN(lenCntMovMean,1);     % initialise count buffer from latest N shots
+
 while true
     dir_init_content = dir(dirMon);
     file_names = {dir_init_content.name};
@@ -175,6 +183,16 @@ while true
                 fprintf(' Converted \n');
                 fprintf('%0.0f counts\n',counts);
                 
+                % update count buffer
+                count_circ_buffer=circshift(count_circ_buffer,-1,1);
+                count_circ_buffer(end)=counts;
+                simpMovAvg=mean(count_circ_buffer,'omitnan');   % evaluate current simple moving average
+                % report smoothed number
+                fprintf('Simple moving average of counts = %0.3g\n',simpMovAvg);
+
+                % TODO
+                % - [ ] can use count_circ_buffer to do dynamic plotting
+
                 %here is where i need to update filenames_dates for the
                 %file i just processed
                 
