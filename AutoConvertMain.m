@@ -1,44 +1,26 @@
-% this will automaticaly monitor a directory and any files that match the 
-% formating of thed tdc output files will convert them into txy format.
-% The motivation is to somewhat front load the computation so that at the back end
-% (analysis) it wont take as long. Further the DLD front pannel can directly
-% acess these txy files to speed up looking at the data. 
-%the code finds new or modified files (for free run) and then converts them
-%after checking that the modification date is 1s in the past, or will wait
-%till that is the case. This prevents converting a partial file.
-%the program can also gracefully handle files being deleted
-
-%TO BE IMPRVOVED
-%strange runtime issue if the program waits to read a new file
-%on converting it it realizes that the last modification date is after what
-%triggered it originaly, to fix this i tried mod date once
-%done waiting but still get the bug. Further investigation will look at how
-%the tdc program writes the data as it may buffer then write at the end.
-%If this is the case just wait the time out time since the creation or
-%recent modification (that trigered the read).
-
-%implement EMAIL notifications
-
-%determine if datenum gives better resolution on the modification time of a
-%file so that the wait_for_mod can be improved
-
-%plot the counts of the last 300 conversions
- 
+function AutoConvert()
+%
+% AutoConvert ( )
+%
+% Continuously monitors the TDC output directory and processes incoming raw data into the TXY reconstructed format in real-time.
+% The motivation is to somewhat front load the computation so that at the back end (analysis) TXY data is ready to be directly loadable. 
+% Further the DLD front pannel can directly access these TXY files to speed up user monitoring of the experiment in real-time. 
+%
+% New or modified files (for free run) are detected and converted after checking that the modification date is 1s in the past, or will wait till that is the case. This prevents converting a partial file.
+% The program can also gracefully handle files being deleted
+% 
 
 
-%START USER VARIABLES
-%watching_dir='D:\Public Data\Big Data\AutoConvert\testdir';
+%%% START USER VARIABLES
 watching_dir='C:\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
-%watching_dir='S:\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
-%Low_Count_Size=0.5;%min size in MB
-Low_Count_Size=0.0;
-wait_for_mod=2; %how many seconds in the past the modification date must be before proceding
+Low_Count_Size=0.0;     %min size in MB
+wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
 %must be greater than 2 as mod time is only recorded to seconds
 
 first_beep=0;
 second_beep=1;
 
-%END USER VAIRABLES
+%%% END USER VAIRABLES
 
 loop_num=1;
 pause on
@@ -238,4 +220,4 @@ while true
       end
 end
     
-
+end

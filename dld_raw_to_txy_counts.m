@@ -5,7 +5,7 @@
 %%% output files with '_txy_forc'
 
 
-function[counts] = dld_raw_to_txy(filename_raw,startfile,end_file)
+function[counts] = dld_raw_to_txy_counts(filename_raw,startfile,end_file)
 %tic
 for i=startfile:end_file
     
