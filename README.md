@@ -1,5 +1,10 @@
-AutoConvert
+TDC AutoConverter
 --------------------------------------------------------------------------------
+
+This is a fork of `AutoConvert v2` - a super useful tool for He\* BEC lab at ANU.
+
+## Blurb (original)
+
  this will automaticaly monitor a directory and any files that match the 
 formating of thed tdc output files will convert them into txy format.
 The motivation is to somewhat front load the computation so that at the back end
@@ -13,3 +18,7 @@ the program can also gracefully handle files being deleted
 TO BE IMPRVOVED
 no known issues
  
+## Improvements
+- It's properly version controlled on git
+- [ ] Simple moving average of reconstructed hit counts would be beneficial to user 
+- [ ] package into a function
