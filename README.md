@@ -20,8 +20,9 @@ no known issues
  
 ## Improvements
 - It's properly version controlled on git
-- [ ] Simple moving average of reconstructed hit counts would be beneficial to user 
-- [ ] package into a function
+- [x] Simple moving average of reconstructed hit counts would be beneficial to user 
+- [x] package into a function
+- [ ] dynamic plotting of count trend (last few shots)
 
 ``` matlab
 %TO BE IMPRVOVED
