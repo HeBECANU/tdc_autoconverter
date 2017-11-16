@@ -26,10 +26,11 @@ If running on the TDC data acquisition machine, simply run the function without 
 ## Improvements
 - It's properly version controlled on git
 - v4.0
-    - [ ] TEST
+    - [x] TEST - OK. need to printout more details TODO
     - [x] Simple moving average of reconstructed hit counts would be beneficial to user 
     - [x] package into a function
-- [ ] dynamic plotting of count trend (last few shots)
+    - [ ] dynamic plotting of count trend (last few shots)
+    - [ ] refresh stdout so that it's tidier and to be easy with -nodisplay environment
 
 ``` matlab
 %TO BE IMPRVOVED
