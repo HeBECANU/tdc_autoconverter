@@ -17,11 +17,18 @@ the program can also gracefully handle files being deleted
 
 TO BE IMPRVOVED
 no known issues
+
+## Usage
+In Matlab, call `AutoConvert(DIR/TO/MONITOR,minFileSize,numMovAvg)`. 
+
+If running on the TDC data acquisition machine, simply run the function without any arguments - it will use the default settings. 
  
 ## Improvements
 - It's properly version controlled on git
-- [x] Simple moving average of reconstructed hit counts would be beneficial to user 
-- [x] package into a function
+- v4.0
+    - [ ] TEST
+    - [x] Simple moving average of reconstructed hit counts would be beneficial to user 
+    - [x] package into a function
 - [ ] dynamic plotting of count trend (last few shots)
 
 ``` matlab
