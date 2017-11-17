@@ -56,6 +56,13 @@ fprintf('\nMonitoring %s ', dirMon);
 count_circ_buffer=NaN(lenCntMovMean,1);     % initialise count buffer from latest N shots
 
 while true
+    %%% pretty output
+    clc;
+    fprintf('-----------------------------------------------------------------------------\n');
+    disp(datetime);     % tag current date-time
+    fprintf('\n');
+    
+    %%% monitor directory
     dir_init_content = dir(dirMon);
     file_names = {dir_init_content.name};
     file_dates=  {dir_init_content.date};
@@ -180,19 +187,22 @@ while true
                 filenum=str2num(numpart); %convert to int
                 
                 counts=dld_raw_to_txy_counts(filename,filenum,filenum);
-                fprintf(' Converted \n');
+                fprintf(' Converted! \n');
                 fprintf('%0.0f counts\n',counts);
                 
                 % update count buffer
                 count_circ_buffer=circshift(count_circ_buffer,-1,1);
                 count_circ_buffer(end)=counts;
-                simpMovAvg=mean(count_circ_buffer,'omitnan');   % evaluate current simple moving average
+                % simple moving filter (diagnostic for drift and stability)
+                simpMovAvg=mean(count_circ_buffer,'omitnan');   
+                simpMovStd=std(count_circ_buffer,'omitnan');    
                 % report smoothed number
-                fprintf('Simple moving average of counts = %0.3g\n',simpMovAvg);
+                fprintf('\n* S.M.A.[%d] = %8.3g; sdev = %8.2g\n',lenCntMovMean,simpMovAvg,simpMovStd);
 
                 % TODO
                 % - [ ] can use count_circ_buffer to do dynamic plotting
-
+                
+                
                 %here is where i need to update filenames_dates for the
                 %file i just processed
                 
@@ -235,7 +245,7 @@ while true
             end
         end
         
-        fprintf('Monitoring %s ', dirMon);
+        fprintf('\nMonitoring %s ', dirMon);
         loop_num=1;
     else
         
