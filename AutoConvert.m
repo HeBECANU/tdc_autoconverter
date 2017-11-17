@@ -55,13 +55,7 @@ fprintf('\nMonitoring %s ', dirMon);
     
 count_circ_buffer=NaN(lenCntMovMean,1);     % initialise count buffer from latest N shots
 
-while true
-    %%% pretty output
-    clc;
-    fprintf('-----------------------------------------------------------------------------\n');
-    disp(datetime);     % tag current date-time
-    fprintf('\n');
-    
+while true    
     %%% monitor directory
     dir_init_content = dir(dirMon);
     file_names = {dir_init_content.name};
@@ -245,7 +239,10 @@ while true
             end
         end
         
-        fprintf('\nMonitoring %s ', dirMon);
+        %%% pretty output
+        fprintf('-----------------------------------------------------------\n');
+        fprintf('Monitoring %s ', dirMon);
+        
         loop_num=1;
     else
         
