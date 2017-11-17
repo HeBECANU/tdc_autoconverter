@@ -29,11 +29,14 @@ end
 %%% moving mean reporter
 if ~exist('lenCntMovMean','var')
     warning('lenCntMovMean is undefined. Setting to default: 20');
-    lenCntMovMean=20;
+    lenCntMovMean=30;
 end
 
 
 %%% CONFIGS
+% TODO can be function arg
+lenLongTrendPlot=500;
+
 wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
 %must be greater than 2 as mod time is only recorded to seconds
 
@@ -54,6 +57,14 @@ initial_file_names=initial_file_names(3:end);
 fprintf('\nMonitoring %s ', dirMon);
     
 count_circ_buffer=NaN(lenCntMovMean,1);     % initialise count buffer from latest N shots
+
+% long term count trend graph
+trend_circ_buffer=NaN(lenLongTrendPlot,1);
+hfig_trend=figure();
+h=plot(trend_circ_buffer,'YDataSource','trend_circ_buffer',...
+    'Color','b','LineStyle','--','Marker','d','LineWidth',2);
+title('Total hit-count trend');
+ylabel('Tot counts');
 
 while true    
     %%% monitor directory
@@ -184,9 +195,13 @@ while true
                 fprintf(' Converted! \n');
                 fprintf('%0.0f counts\n',counts);
                 
-                % update count buffer
+                % update count buffers
                 count_circ_buffer=circshift(count_circ_buffer,-1,1);
                 count_circ_buffer(end)=counts;
+                
+                trend_circ_buffer=circshift(trend_circ_buffer,-1,1);
+                trend_circ_buffer(end)=counts;
+                
                 % simple moving filter (diagnostic for drift and stability)
                 simpMovAvg=mean(count_circ_buffer,'omitnan');   
                 simpMovStd=std(count_circ_buffer,'omitnan');    
@@ -194,8 +209,11 @@ while true
                 fprintf('\n* S.M.A.[%d] = %8.3g; sdev = %8.2g\n',lenCntMovMean,simpMovAvg,simpMovStd);
 
                 % TODO
-                % - [ ] can use count_circ_buffer to do dynamic plotting
-                
+                % - [x] ~~can use count_circ_buffer to do dynamic plotting~~ use a longer trend
+                % refresh plot
+                refreshdata(h, 'caller')
+                axis auto;
+                drawnow;
                 
                 %here is where i need to update filenames_dates for the
                 %file i just processed
