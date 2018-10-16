@@ -1,51 +1,30 @@
-TDC AutoConverter
---------------------------------------------------------------------------------
+# tdc_autoconverter
+**Bryce M. Henson, Dong K. Shin**  
+A matlab function that detetects new Delay Line Detector (DLD) files in a directory and processes them into a position time format that is saved.  
 
-This is a fork of `AutoConvert v2` - a super useful tool for He\* BEC lab at ANU.
+By front loading this fairly time consuming processing, later data analysis is dramatically sped up.
 
-## Blurb (original)
 
- this will automaticaly monitor a directory and any files that match the 
-formating of thed tdc output files will convert them into txy format.
-The motivation is to somewhat front load the computation so that at the back end
- (analysis) it wont take as long. Further the DLD front pannel can directly
-acess these txy files to speed up looking at the data. 
-the code finds new or modified files (for free run) and then converts them
-after checking that the modification date is 1s in the past, or will wait
-till that is the case. This prevents converting a partial file.
-the program can also gracefully handle files being deleted
-
-TO BE IMPRVOVED
-no known issues
+## Features
+- multiple checks that the data is done writing as there is no inbuilt end of data in the file
+  -  the file modification time is in the past
+  -  the last character is a newline
+- checks if the DLD data file is newer than the processed file so that it can work even when the data files are being overridden. This occurs in the free run configuration where the data file is continually overridden. 
+- for historical reasons the processed data is stored in the format [data name]_txy_forc[shot number].txt  eg. d_txy_forc1.txt
+- checks if the first line of the data file is in the right format as another check
+- gracefully handles a file being deleted
+- gracefully handles a premature conversion
 
 ## Usage
-In Matlab, call `AutoConvert(DIR/TO/MONITOR,minFileSize,numMovAvg)`. 
+In Matlab, call ````AutoConvert(DIR/TO/MONITOR,minFileSize,numMovAvg)````.
 
 If running on the TDC data acquisition machine, simply run the function without any arguments - it will use the default settings. 
  
-## Improvements
-- It's properly version controlled on git
-- v4.0
+## Improvements/Issues
+    - [ ] improved function documentation and example usage
     - [x] TEST - OK. need to printout more details TODO
     - [x] Simple moving average of reconstructed hit counts would be beneficial to user 
     - [x] package into a function
-    - [ ] dynamic plotting of count trend (last few shots)
+    - [x] dynamic plotting of count trend (last few shots)
+    - [ ] re-implment email alerts (in a way that does not expose an email password on git)
     - [ ] refresh stdout so that it's tidier and to be easy with -nodisplay environment
-
-``` matlab
-%TO BE IMPRVOVED
-%strange runtime issue if the program waits to read a new file
-%on converting it it realizes that the last modification date is after what
-%triggered it originaly, to fix this i tried mod date once
-%done waiting but still get the bug. Further investigation will look at how
-%the tdc program writes the data as it may buffer then write at the end.
-%If this is the case just wait the time out time since the creation or
-%recent modification (that trigered the read).
-
-%implement EMAIL notifications
-
-%determine if datenum gives better resolution on the modification time of a
-%file so that the wait_for_mod can be improved
-
-%plot the counts of the last 300 conversions
-```
