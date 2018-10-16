@@ -1,5 +1,5 @@
 # tdc_autoconverter
-**Bryce M. Henson, Dong K. Shin**  
+***Bryce M. Henson, [Dong K. Shin](https://github.com/spicydonkey)***
 A matlab function that detetects new Delay Line Detector (DLD) files in a directory and processes them into a position time format that is saved.  
 
 By front loading this fairly time consuming processing, later data analysis is dramatically sped up.
