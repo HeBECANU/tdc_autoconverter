@@ -18,6 +18,14 @@ function AutoConvert(dirMon,minFilePassSizeMb,lenCntMovMean)
 %   - add in in find_data_files
 %   - fix email alert
 
+
+%add all subfolders to the path
+this_folder = fileparts(which(mfilename));
+% Add that folder plus all subfolders to the path.
+addpath(genpath(this_folder));
+
+
+
 dirMon_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
 
 % parse inputs
