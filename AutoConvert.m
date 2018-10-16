@@ -9,8 +9,16 @@ function AutoConvert(dirMon,minFilePassSizeMb,lenCntMovMean)
 % New or modified files (for free run) are detected and converted after checking that the modification date is 1s in the past, or will wait till that is the case. This prevents converting a partial file.
 % The program can also gracefully handle files being deleted
 % 
+%Contributors
+%Bryce Henson (bryce.henson@live.com), David Shin
+%To Do
+%   - add check that last line is empty to signal that file is done writing
+%   - documentation
+%   - sad sound if not enoguh atoms
+%   - add in in find_data_files
+%   - fix email alert
 
-dirMon_default='C:\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
+dirMon_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
 
 % parse inputs
 %%% monitoring directory
@@ -36,7 +44,6 @@ end
 %%% CONFIGS
 % TODO can be function arg
 lenLongTrendPlot=500;
-
 wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
 %must be greater than 2 as mod time is only recorded to seconds
 
@@ -44,7 +51,7 @@ first_beep=0;
 second_beep=1;
 
 %%% END CONFIGS 
-
+addpath('FileTime_29Jun2011') %required for is_early to work
 loop_num=1;
 pause on
 dir_init_content = dir(dirMon);
@@ -54,18 +61,18 @@ initial_filenames_dates=[ initial_file_names ; initial_file_dates ]';
 %cut . and .. from the listings
 initial_filenames_dates=initial_filenames_dates(3:end,:);
 initial_file_names=initial_file_names(3:end);
-fprintf('\nMonitoring %s ', dirMon);
+fprintf('\nMonitoring %s \n ', dirMon);
     
 count_circ_buffer=NaN(lenCntMovMean,1);     % initialise count buffer from latest N shots
 
 % long term count trend graph
 trend_circ_buffer=NaN(lenLongTrendPlot,1);
-hfig_trend=figure();
+hfig_trend=figure(1);
 h=plot(trend_circ_buffer,'YDataSource','trend_circ_buffer',...
     'Color','b','LineStyle','--','Marker','d','LineWidth',2);
 title('Total hit-count trend');
 ylabel('Tot counts');
-
+set(gcf, 'Color', [1,1,1]);
 while true    
     %%% monitor directory
     dir_init_content = dir(dirMon);
@@ -124,8 +131,10 @@ while true
           SecondLine=fgetl(FID);
           fclose(FID);
           %check that the line lengths are right with 1 comma
-          pass_line_test(k)=FirstLine(1)=='5' && size(SecondLine,2)<=15 ...
-          && size(FirstLine,2)<=15 && sum(SecondLine==',')==1 && sum(FirstLine==',')==1;
+          if  ~isequal(FirstLine,[]) && ~isequal(SecondLine,[])
+            pass_line_test(k)=FirstLine(1)=='5' && size(SecondLine,2)<=15 ...
+            && size(FirstLine,2)<=15 && sum(SecondLine==',')==1 && sum(FirstLine==',')==1;
+          end
         end
         if sum(pass_line_test)>0  
             new_files=new_files(logical(pass_line_test));
@@ -191,7 +200,7 @@ while true
                 filename=filename(1:end-size(numpart,2)); %remove numbers %C:/dir/d
                 filenum=str2num(numpart); %convert to int
                 
-                counts=dld_raw_to_txy_counts(filename,filenum,filenum);
+                [counts,filename_txy]=dld_raw_to_txy_counts(filename,filenum,filenum);
                 fprintf(' Converted! \n');
                 fprintf('%0.0f counts\n',counts);
                 
@@ -208,12 +217,20 @@ while true
                 % report smoothed number
                 fprintf('\n* S.M.A.[%d] = %8.3g; sdev = %8.2g\n',lenCntMovMean,simpMovAvg,simpMovStd);
 
-                % TODO
-                % - [x] ~~can use count_circ_buffer to do dynamic plotting~~ use a longer trend
                 % refresh plot
                 refreshdata(h, 'caller')
                 axis auto;
                 drawnow;
+                
+                
+                %%% START
+                % simple global rotation experiment health check up 
+%                 this_txy=txy_importer(fullfile(dirMon,'\d'),filenum);   % get TXY for this file
+%                 ferr_log=fullfile(dirMon,'ferr_log.txt');
+%                 getExpFailureMode(this_txy,ferr_log);
+                
+                %%% END
+                
                 
                 %here is where i need to update filenames_dates for the
                 %file i just processed
@@ -259,7 +276,7 @@ while true
         
         %%% pretty output
         fprintf('-----------------------------------------------------------\n');
-        fprintf('Monitoring %s ', dirMon);
+        fprintf('Monitoring %s \n', dirMon);
         
         loop_num=1;
     else
