@@ -21,6 +21,7 @@ In Matlab, call ````AutoConvert(DIR/TO/MONITOR,minFileSize,numMovAvg)````.
 If running on the TDC data acquisition machine, simply run the function without any arguments - it will use the default settings. 
  
 ## Improvements/Issues
+    - [ ] nice picture for github
     - [ ] improved function documentation and example usage
     - [x] TEST - OK. need to printout more details TODO
     - [x] Simple moving average of reconstructed hit counts would be beneficial to user 
