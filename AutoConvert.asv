@@ -15,7 +15,6 @@ function AutoConvert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
 %   [x] add check that last line is empty to signal that file is done writing
 %   [x] sad sound if file too small
 %   [ ] save picture of atom number history
-%   [ ] verbose levels
 %   - documentation
 %   - sad sound if not enoguh atoms
 %   - add in in find_data_files
@@ -25,9 +24,9 @@ function AutoConvert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
 lenLongTrendPlot=500;
 wait_for_mod=2;         %how many seconds in the past the modification date must be before proceding
 %must be greater than 2 as mod time is only recorded to seconds
+
 first_beep=0;
 second_beep=1;
-mon_dir_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
 % END USER VAR-----------------------------------------------------------
 
 
@@ -35,6 +34,8 @@ mon_dir_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\d
 this_folder = fileparts(which(mfilename));
 % Add that folder plus all subfolders to the path.
 addpath(genpath(this_folder));
+
+mon_dir_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
 
 % parse inputs
 if ~exist('mon_dir','var')
@@ -56,10 +57,7 @@ if ~exist('min_counts_hz','var')
     min_counts_hz=200;
     warning('min_counts_hz is undefined. Setting to default: %.1f',min_counts_hz);
 end
-%make a 
-if (exist(fullfile(mon_dir,'out'),'dir') == 0), mkdir(fullfile(mon_dir,'out')); end
-anal_out_dir=[fullfile(mon_dir,'out','monitor'),filesep];
-if (exist(anal_out_dir, 'dir') == 0), mkdir(anal_out_dir); end
+
 
 %set up the output sounds
 happy_sound=[];
@@ -68,11 +66,12 @@ dur=0.03;
 t = linspace(0,dur,dur*happy_sound.fs);
 f = 1450;
 happy_sound.wf = gausswin(size(t,2),3)'.*sin(2*pi*f*t);
-%sound(happy_sound.wf, happy_sound.fs)      
+sound(happy_sound.wf, happy_sound.fs)      
 clear('dur','f','t')
 sad_sound=[];
 [sad_sound(1).wf, sad_sound(1).fs] = audioread(fullfile('.','lib','sounds','Upset_TwoTone.mp3'));
 [sad_sound(2).wf, sad_sound(2).fs] = audioread(fullfile('.','lib','sounds','Short_Raspberry.mp3'));
+
 start_sound=[];
 [start_sound.wf, start_sound.fs] = audioread(fullfile('.','lib','sounds','Happy_ThreeChirp.mp3'));
 
@@ -91,23 +90,11 @@ count_circ_buffer=NaN(mov_mean_len,1);     % initialise count buffer from latest
 % long term count trend graph
 trend_circ_buffer=NaN(lenLongTrendPlot,1);
 hfig_trend=figure(1);
-h=gca;
-hplot_trend=plot(trend_circ_buffer,'YDataSource','trend_circ_buffer',...
+h=plot(trend_circ_buffer,'YDataSource','trend_circ_buffer',...
     'Color','b','LineStyle','--','Marker','d','LineWidth',2);
 title('Total hit-count trend');
 ylabel('Tot counts');
 set(gcf, 'Color', [1,1,1]);
-grid on    % turn on major grid lines
-grid minor % turn on minor grid lines
-% Set limits and grid spacing separately for the two directions:
-% Must set major grid line properties for both directions simultaneously:
-h.GridLineStyle='-'; % the default is some dotted pattern, I prefer solid
-h.GridAlpha=1;  % the default is partially transparent
-h.GridColor=[0,0,0]; % here's the color for the major grid lines
-% Idem for minor grid line properties:
-h.MinorGridLineStyle='-';
-h.MinorGridAlpha=0.1;
-h.MinorGridColor=[0,0,0]; % here's the color for the minor grid lines
 
 %start sound
 sound(start_sound.wf, start_sound.fs)
@@ -186,9 +173,22 @@ while true
     end
       
     if ~isempty(new_files)
+        %play a sound
+        if first_beep
+            fs = 16000;
+            t = 0:(1/fs):0.02;
+            f = 2000;
+            a = 0.2;
+            y = a*sin(2*pi*f*t);
+            sound(y, fs);
+        end
+         
+        % deal with the new files
+        %meddage with number of new files found
         fprintf('\n(%d) new files detected \n',numel(new_files));
         for k=1:numel(new_files)
             fprintf('waiting to convert %s ...', new_files{k});
+
             %here i check if the modification date is more than 1 second
             %old, this relies on this computers clock being close to the TDC
             %computer (or running on the TDC computer)
@@ -224,30 +224,24 @@ while true
                 filename=filename(1:end-size(numpart,2)); %remove numbers %C:/dir/d
                 filenum=str2num(numpart); %convert to int
                 
-                [counts,max_time]=dld_raw_to_txy_counts(filename,filenum,filenum);
-                fprintf(' done\n');
+                [counts,]=dld_raw_to_txy_counts(filename,filenum,filenum);
+                fprintf(' Converted! \n');
+                fprintf('%0.0f counts\n',counts);
                 
-                avg_rate=counts/max_time;
-                if avg_rate<min_counts_hz
-                    fprintf(2,'!!!!!!!!!!!!!!!!!!!LOW COUNTS!!!!!!!!!!!!!!!!!!\n');
-                    fprintf(2,'Total Counts %u avg rate in file %.3f \n',counts,avg_rate);
-                    sound(sad_sound(1).wf, sad_sound(1).fs);
-                end
                 % update count buffers
                 count_circ_buffer=circshift(count_circ_buffer,-1,1);
                 count_circ_buffer(end)=counts;
                 trend_circ_buffer=circshift(trend_circ_buffer,-1,1);
                 trend_circ_buffer(end)=counts;
                 % simple moving filter (diagnostic for drift and stability)
-                mov_avg_counts=mean(count_circ_buffer,'omitnan');   
-                mov_std_counts=std(count_circ_buffer,'omitnan');    
+                simpMovAvg=mean(count_circ_buffer,'omitnan');   
+                simpMovStd=std(count_circ_buffer,'omitnan');    
                 % report smoothed number
-                fprintf('counts %0.0f, SMA(%d) %0.0f, sd %0.0f\n',counts,mov_mean_len,mov_avg_counts,mov_std_counts); % %8.3g
+                fprintf('\n* S.M.A.[%d] = %8.3g; sdev = %8.2g\n',mov_mean_len,simpMovAvg,simpMovStd);
                 % refresh plot
-                refreshdata(hplot_trend, 'caller')
+                refreshdata(h, 'caller')
                 axis auto;
                 drawnow;
-                saveas(gcf,fullfile(anal_out_dir,'number_history.png'))
                 %TODO: save plot to file
                 
                 
@@ -301,8 +295,8 @@ while true
         end
         
         %%% pretty output
-        %fprintf('-----------------------------------------------------------\n');
-        %fprintf('Monitoring %s \n', mon_dir);
+        fprintf('-----------------------------------------------------------\n');
+        fprintf('Monitoring %s \n', mon_dir);
         
         loop_num=1;
     else
