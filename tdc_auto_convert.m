@@ -1,4 +1,4 @@
-function AutoConvert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
+function tdc_auto_convert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
 %
 % AutoConvert (mon_dir,min_file_size_mb,mov_mean_len)
 %
