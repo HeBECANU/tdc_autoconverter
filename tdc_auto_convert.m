@@ -12,14 +12,8 @@ function tdc_auto_convert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
 %Contributors
 %Bryce Henson (bryce.henson@live.com), David Shin
 %To Do
-%   [x] add check that last line is empty to signal that file is done writing
-%   [x] sad sound if file too small
-%   [ ] save picture of atom number history
-%   [ ] verbose levels
-%   - documentation
-%   - sad sound if not enoguh atoms
-%   - add in in find_data_files
-%   - fix email alert
+% see README.md
+
 
 % BEGIN USER VAR-------------------------------------------------
 lenLongTrendPlot=500;
