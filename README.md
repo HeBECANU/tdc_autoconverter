@@ -25,6 +25,7 @@ In Matlab, call ````tdc_auto_convert(DIR/TO/MONITOR,,min_file_size_mb,min_counts
 If running on the TDC data acquisition machine, simply run the function without any arguments - it will use the default settings. 
  
 ## Improvements/Issues
+    - [ ] include https://github.com/brycehenson/Core_BEC_Analysis as submodule to reduce code redundancy
     - [ ] improved function documentation and example usage
 	- [ ] fix the x axis of the plot to be time or shot number
 	- [ ] integerate with find_data_files for cleaner code
@@ -37,7 +38,7 @@ If running on the TDC data acquisition machine, simply run the function without 
     - [x] package into a function
     - [x] dynamic plotting of count trend (last few shots)
 	- [x] output plot image to ./out/monitor/number_history.png
-	- [x] sad sound if
+	- [x] sad sound if low atom number
     
 ## Contributions
 This project would not have been possible without the open source tools that it is based on.
