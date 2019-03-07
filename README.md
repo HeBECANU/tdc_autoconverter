@@ -6,7 +6,14 @@ By front loading this fairly time consuming processing, later data analysis is d
 
 ![Count histor](number_history.png)
 
-
+## Install
+``` 
+git clone --recurse-submodules -j8 https://github.com/brycehenson/tdc_autoconverter.git
+```
+then to update 
+```
+git submodule update --remote --merge
+```
 
 ## Features
 - multiple checks that the data is done writing as there is no inbuilt end of data in the file
