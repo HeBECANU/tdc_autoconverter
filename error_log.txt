@@ -1,0 +1,14 @@
+
+got this error
+
+
+waiting to convert d523.txt ...Index in position 1 is invalid. Array indices must be positive integers or
+logical values.
+
+Error in dld_raw_to_txy_counts (line 17)
+    tlast=hits_sorted(end,1);
+
+Error in tdc_auto_convert (line 229)
+                [counts,max_time]=dld_raw_to_txy_counts(filename,filenum,filenum); 
+				
+				
