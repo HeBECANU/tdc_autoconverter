@@ -1,0 +1,4 @@
+0000000000000000000000000000000000000000 f519da22b9d95070c65b996f9b8d61f2142c5856 David <dk.shin199@gmail.com> 1510894694 +1100	clone: from git@github.com:spicydonkey/tdc_autoconverter.git
+f519da22b9d95070c65b996f9b8d61f2142c5856 6462ea3cd5c674c166186b73f36d92af323f4c3d David <dk.shin199@gmail.com> 1510897145 +1100	commit: improve output
+6462ea3cd5c674c166186b73f36d92af323f4c3d 7a2fd9b81d50fbf9fb83f4e602ff1c281120f252 David <dk.shin199@gmail.com> 1510897730 +1100	commit: fix output
+7a2fd9b81d50fbf9fb83f4e602ff1c281120f252 21872884337319ec1ed66a15e57cec410b31e283 David <dk.shin199@gmail.com> 1510898641 +1100	commit: dynamic plotting of long term trend!
