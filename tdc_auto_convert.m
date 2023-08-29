@@ -1,5 +1,5 @@
 function tdc_auto_convert(mon_dir,min_file_size_mb,min_counts_hz,mov_mean_len)
-%
+
 % AutoConvert (mon_dir,min_file_size_mb,mov_mean_len)
 %
 % Continuously monitors the TDC output directory and processes incoming raw data into the TXY reconstructed format in real-time.
@@ -27,7 +27,8 @@ wait_for_mod=4;         %how many seconds in the past the modification date must
 %must be greater than 2 as mod time is only recorded to seconds
 first_beep=0;
 second_beep=1;
-mon_dir_default='\\amplpc29\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
+mon_dir_default='C:\Users\TDC_user\ProgramFiles\my_read_tdc_gui_v1.0.1\dld_output';
+start_channel = '5';%'4';%
 % END USER VAR-----------------------------------------------------------
 
 
@@ -175,7 +176,7 @@ while true
           fclose(FID);
           %check that the line lengths are right with 1 comma
           if  ~isequal(FirstLine,[]) && ~isequal(SecondLine,[])
-            pass_line_test(k)=FirstLine(1)=='5' && size(SecondLine,2)<=15 ...
+            pass_line_test(k)=FirstLine(1)==start_channel && size(SecondLine,2)<=15 ...
             && size(FirstLine,2)<=15 && sum(SecondLine==',')==1 && sum(FirstLine==',')==1;
           end
         end
