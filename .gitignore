@@ -1,2 +1,5 @@
 # vim
 .*.sw*
+*.DS_Store
+test_mon_folder
+*.asv
